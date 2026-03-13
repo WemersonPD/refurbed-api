@@ -3,6 +3,7 @@ package repositories
 import (
 	"assignment-backend/pkg/models"
 	utils_jsongloader "assignment-backend/pkg/utils/jsongloader"
+	utils_numbers "assignment-backend/pkg/utils/numbers"
 	"context"
 )
 
@@ -20,7 +21,7 @@ type productsRepository struct {
 	jsonLoader utils_jsongloader.JSONLoader
 }
 
-func NewProductsRepository() *productsRepository {
+func NewProductsRepository() ProductsRepository {
 	return &productsRepository{
 		jsonLoader: utils_jsongloader.NewJSONLoader(),
 	}
@@ -49,7 +50,8 @@ func (p *productsRepository) joinProductsMetadataAndDetails(metadata []*models.P
 
 	for _, meta := range metadata {
 		if detail, exists := detailsMap[meta.ID]; exists {
-			// discountedPrice := utils_numbers.CalculateDiscountedPrice(meta.BasePrice, detail.DiscountPercent)
+			// If we were using a database, we would calculate the discounted price in the QUERY.
+			discountedPrice := utils_numbers.CalculateDiscountedPrice(meta.BasePrice, detail.DiscountPercent)
 
 			product := &models.Product{
 				// Detail fields
@@ -65,7 +67,7 @@ func (p *productsRepository) joinProductsMetadataAndDetails(metadata []*models.P
 				BasePrice: meta.BasePrice,
 
 				// // Calculated fields
-				// DiscountedPrice: discountedPrice,
+				DiscountedPrice: discountedPrice,
 			}
 			products = append(products, product)
 		}

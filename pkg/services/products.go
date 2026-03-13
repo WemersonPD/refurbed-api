@@ -1,0 +1,30 @@
+package services
+
+import (
+	"assignment-backend/pkg/models"
+	"assignment-backend/pkg/repositories"
+	"context"
+)
+
+type ProductService interface {
+	GetProducts(ctx context.Context) ([]*models.Product, error)
+}
+
+type productService struct {
+	productsRepository repositories.ProductsRepository
+}
+
+func NewProductService() ProductService {
+	return &productService{
+		productsRepository: repositories.NewProductsRepository(),
+	}
+}
+
+func (s *productService) GetProducts(ctx context.Context) ([]*models.Product, error) {
+	// Get the data from cache.
+
+	// Get the data from database if not in cache.
+	products, err := s.productsRepository.GetProducts(ctx)
+
+	return products, err
+}
