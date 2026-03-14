@@ -4,7 +4,9 @@ import (
 	"assignment-backend/pkg/models"
 	utils_jsongloader "assignment-backend/pkg/utils/jsongloader"
 	utils_numbers "assignment-backend/pkg/utils/numbers"
+	"cmp"
 	"context"
+	"slices"
 )
 
 const (
@@ -14,7 +16,7 @@ const (
 
 type ProductsRepository interface {
 	// GetProducts reads the metadata and details, merges them and returns the list of products.
-	GetProducts(ctx context.Context, filters *models.ProductFilters) (products []*models.Product, err error)
+	GetProducts(ctx context.Context, filters *models.ProductFilters, sortBy models.ProductSortBy) (products []*models.Product, err error)
 }
 
 type productsRepository struct {
@@ -106,7 +108,39 @@ func (p *productsRepository) applyProductFilters(products []*models.Product, fil
 	return filteredProducts
 }
 
-func (p *productsRepository) GetProducts(_ context.Context, filters *models.ProductFilters) (products []*models.Product, err error) {
+func (p *productsRepository) sortProducts(products []*models.Product, sortBy models.ProductSortBy) []*models.Product {
+	switch sortBy {
+	case models.SortByPriceAsc:
+		slices.SortFunc(products, func(a, b *models.Product) int {
+			return cmp.Compare(a.DiscountedPrice, b.DiscountedPrice)
+		})
+
+	case models.SortByPriceDesc:
+		slices.SortFunc(products, func(a, b *models.Product) int {
+			return cmp.Compare(b.DiscountedPrice, a.DiscountedPrice)
+		})
+
+	case models.SortByBestseller:
+		slices.SortFunc(products, func(a, b *models.Product) int {
+			if a.Bestseller != b.Bestseller {
+				if a.Bestseller {
+					// If a is bestseller and b is not, a should come first (return -1)
+					return -1
+				}
+
+				// If b is bestseller and a is not, b should come first (return 1)
+				return 1
+			}
+
+			// If both have the same bestseller status, we keep their original order (return 0).
+			return 0
+		})
+	}
+
+	return products
+}
+
+func (p *productsRepository) GetProducts(_ context.Context, filters *models.ProductFilters, sortBy models.ProductSortBy) (products []*models.Product, err error) {
 	metadata, err := p.getProductsMetadata()
 	if err != nil {
 		return nil, err
@@ -122,6 +156,9 @@ func (p *productsRepository) GetProducts(_ context.Context, filters *models.Prod
 
 	// Apply filters / WHERE clause in database.
 	products = p.applyProductFilters(products, filters)
+
+	// Apply sorting / ORDER BY clause in database.
+	products = p.sortProducts(products, sortBy)
 
 	return products, nil
 }

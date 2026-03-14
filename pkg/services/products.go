@@ -7,7 +7,7 @@ import (
 )
 
 type ProductService interface {
-	GetProducts(ctx context.Context, filters *models.ProductFilters) ([]*models.Product, error)
+	GetProducts(ctx context.Context, filters *models.ProductFilters, sort models.ProductSortBy) ([]*models.Product, error)
 }
 
 type productService struct {
@@ -20,11 +20,11 @@ func NewProductService() ProductService {
 	}
 }
 
-func (s *productService) GetProducts(ctx context.Context, filters *models.ProductFilters) ([]*models.Product, error) {
+func (s *productService) GetProducts(ctx context.Context, filters *models.ProductFilters, sort models.ProductSortBy) ([]*models.Product, error) {
 	// Get the data from cache.
 
 	// Get the data from database if not in cache.
-	products, err := s.productsRepository.GetProducts(ctx, filters)
+	products, err := s.productsRepository.GetProducts(ctx, filters, sort)
 
 	return products, err
 }

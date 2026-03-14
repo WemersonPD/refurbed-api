@@ -24,9 +24,10 @@ func NewProductsController() ProductsController {
 
 func (c *productsController) GetProducts(w http.ResponseWriter, r *http.Request) {
 	filters := models.NewProductFiltersFromRequest(r)
+	sort := models.NewProductSortFromRequest(r)
 
 	ctx := r.Context()
-	products, err := c.productService.GetProducts(ctx, filters)
+	products, err := c.productService.GetProducts(ctx, filters, sort)
 	if err != nil {
 		utils_response.Error(w, http.StatusInternalServerError, "Failed to retrieve products")
 		return
