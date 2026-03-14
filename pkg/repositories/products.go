@@ -14,7 +14,7 @@ const (
 
 type ProductsRepository interface {
 	// GetProducts reads the metadata and details, merges them and returns the list of products.
-	GetProducts(ctx context.Context) (products []*models.Product, err error)
+	GetProducts(ctx context.Context, filters *models.ProductFilters) (products []*models.Product, err error)
 }
 
 type productsRepository struct {
@@ -76,7 +76,37 @@ func (p *productsRepository) joinProductsMetadataAndDetails(metadata []*models.P
 	return products
 }
 
-func (p *productsRepository) GetProducts(_ context.Context) (products []*models.Product, err error) {
+// applyProductFilters applies the filters to the products slice and returns the filtered slice.
+// In a real application, we would apply these filters in the database query (WHERE clause) instead of in-memory.
+func (p *productsRepository) applyProductFilters(products []*models.Product, filters *models.ProductFilters) []*models.Product {
+	var filteredProducts []*models.Product
+
+	for _, product := range products {
+		if filters.Search != "" && !product.Name.Contains(filters.Search) {
+			continue
+		}
+
+		if filters.Color != "" && !product.Colors.Contains(filters.Color) {
+			continue
+		}
+
+		if filters.Bestseller != nil && product.Bestseller != *filters.Bestseller {
+			continue
+		}
+
+		if filters.MinPrice != nil && filters.MaxPrice != nil {
+			if product.DiscountedPrice < *filters.MinPrice || product.DiscountedPrice > *filters.MaxPrice {
+				continue
+			}
+		}
+
+		filteredProducts = append(filteredProducts, product)
+	}
+
+	return filteredProducts
+}
+
+func (p *productsRepository) GetProducts(_ context.Context, filters *models.ProductFilters) (products []*models.Product, err error) {
 	metadata, err := p.getProductsMetadata()
 	if err != nil {
 		return nil, err
@@ -89,6 +119,9 @@ func (p *productsRepository) GetProducts(_ context.Context) (products []*models.
 
 	// This would be a JOIN if we were using a database.
 	products = p.joinProductsMetadataAndDetails(metadata, details)
+
+	// Apply filters / WHERE clause in database.
+	products = p.applyProductFilters(products, filters)
 
 	return products, nil
 }

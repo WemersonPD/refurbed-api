@@ -7,7 +7,7 @@ import (
 
 type ApiResponse[T any] struct {
 	OK   bool `json:"ok"`
-	Data T    `json:"data,omitempty"`
+	Data T    `json:"data"`
 }
 
 func toJson[T any](w http.ResponseWriter, status int, data T) {

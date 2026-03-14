@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"assignment-backend/pkg/models"
 	"assignment-backend/pkg/services"
 	utils_response "assignment-backend/pkg/utils/response"
 	"net/http"
@@ -22,8 +23,10 @@ func NewProductsController() ProductsController {
 }
 
 func (c *productsController) GetProducts(w http.ResponseWriter, r *http.Request) {
+	filters := models.NewProductFiltersFromRequest(r)
+
 	ctx := r.Context()
-	products, err := c.productService.GetProducts(ctx)
+	products, err := c.productService.GetProducts(ctx, filters)
 	if err != nil {
 		utils_response.Error(w, http.StatusInternalServerError, "Failed to retrieve products")
 		return
