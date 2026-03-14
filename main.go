@@ -2,6 +2,7 @@ package main
 
 import (
 	"assignment-backend/internal/controllers"
+	utils_middlewares "assignment-backend/pkg/utils/middlewares"
 	"log"
 	"net/http"
 )
@@ -26,7 +27,7 @@ func main() {
 	mux.HandleFunc("/products", productsController.GetProducts)
 
 	log.Println("Server starting on http://localhost:8080")
-	if err := http.ListenAndServe(":8080", mux); err != nil {
+	if err := http.ListenAndServe(":8080", utils_middlewares.RecoverErrorMiddleware(mux)); err != nil {
 		log.Fatal(err)
 	}
 }

@@ -4,9 +4,7 @@ import (
 	"assignment-backend/pkg/models"
 	utils_jsongloader "assignment-backend/pkg/utils/jsongloader"
 	utils_numbers "assignment-backend/pkg/utils/numbers"
-	"cmp"
 	"context"
-	"slices"
 )
 
 const (
@@ -16,7 +14,7 @@ const (
 
 type ProductsRepository interface {
 	// GetProducts reads the metadata and details, merges them and returns the list of products.
-	GetProducts(ctx context.Context, filters *models.ProductFilters, sortBy models.ProductSortBy) (products []*models.Product, err error)
+	GetProducts(ctx context.Context, filters *models.ProductFilters, sortBy models.ProductSortBy, pagination *models.Pagination) (products []*models.Product, err error)
 }
 
 type productsRepository struct {
@@ -78,69 +76,7 @@ func (p *productsRepository) joinProductsMetadataAndDetails(metadata []*models.P
 	return products
 }
 
-// applyProductFilters applies the filters to the products slice and returns the filtered slice.
-// In a real application, we would apply these filters in the database query (WHERE clause) instead of in-memory.
-func (p *productsRepository) applyProductFilters(products []*models.Product, filters *models.ProductFilters) []*models.Product {
-	var filteredProducts []*models.Product
-
-	for _, product := range products {
-		if filters.Search != "" && !product.Name.Contains(filters.Search) {
-			continue
-		}
-
-		if filters.Color != "" && !product.Colors.Contains(filters.Color) {
-			continue
-		}
-
-		if filters.Bestseller != nil && product.Bestseller != *filters.Bestseller {
-			continue
-		}
-
-		if filters.MinPrice != nil && filters.MaxPrice != nil {
-			if product.DiscountedPrice < *filters.MinPrice || product.DiscountedPrice > *filters.MaxPrice {
-				continue
-			}
-		}
-
-		filteredProducts = append(filteredProducts, product)
-	}
-
-	return filteredProducts
-}
-
-func (p *productsRepository) sortProducts(products []*models.Product, sortBy models.ProductSortBy) []*models.Product {
-	switch sortBy {
-	case models.SortByPriceAsc:
-		slices.SortFunc(products, func(a, b *models.Product) int {
-			return cmp.Compare(a.DiscountedPrice, b.DiscountedPrice)
-		})
-
-	case models.SortByPriceDesc:
-		slices.SortFunc(products, func(a, b *models.Product) int {
-			return cmp.Compare(b.DiscountedPrice, a.DiscountedPrice)
-		})
-
-	case models.SortByBestseller:
-		slices.SortFunc(products, func(a, b *models.Product) int {
-			if a.Bestseller != b.Bestseller {
-				if a.Bestseller {
-					// If a is bestseller and b is not, a should come first (return -1)
-					return -1
-				}
-
-				// If b is bestseller and a is not, b should come first (return 1)
-				return 1
-			}
-
-			// If both have the same bestseller status, we keep their original order (return 0).
-			return 0
-		})
-	}
-
-	return products
-}
-
-func (p *productsRepository) GetProducts(_ context.Context, filters *models.ProductFilters, sortBy models.ProductSortBy) (products []*models.Product, err error) {
+func (p *productsRepository) GetProducts(_ context.Context, filters *models.ProductFilters, sortBy models.ProductSortBy, pagination *models.Pagination) (products []*models.Product, err error) {
 	metadata, err := p.getProductsMetadata()
 	if err != nil {
 		return nil, err
@@ -155,10 +91,13 @@ func (p *productsRepository) GetProducts(_ context.Context, filters *models.Prod
 	products = p.joinProductsMetadataAndDetails(metadata, details)
 
 	// Apply filters / WHERE clause in database.
-	products = p.applyProductFilters(products, filters)
+	products = filters.ApplyProductFilters(products)
 
 	// Apply sorting / ORDER BY clause in database.
-	products = p.sortProducts(products, sortBy)
+	products = sortBy.SortProducts(products)
+
+	// Apply pagination / LIMIT & OFFSET in database.
+	products = pagination.ApplyProductsPagination(products)
 
 	return products, nil
 }
