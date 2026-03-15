@@ -11,10 +11,14 @@ type ProductFilters struct {
 	Bestseller *bool
 	MinPrice   *float64
 	MaxPrice   *float64
+	Categories []string
+	Brands     []string
+	Conditions []string
 }
 
 func (f *ProductFilters) IsEmpty() bool {
-	return f.Search == "" && f.Color == "" && f.Bestseller == nil && f.MinPrice == nil && f.MaxPrice == nil
+	return f.Search == "" && f.Color == "" && f.Bestseller == nil && f.MinPrice == nil && f.MaxPrice == nil &&
+		len(f.Categories) == 0 && len(f.Brands) == 0 && len(f.Conditions) == 0
 }
 
 // ApplyProductFilters applies the filters to the given list of products and returns the filtered list.
@@ -43,6 +47,18 @@ func (f *ProductFilters) ApplyProductFilters(products []*Product) (filteredProdu
 			}
 		}
 
+		if len(f.Categories) > 0 && !product.Category.Contains(f.Categories) {
+			continue
+		}
+
+		if len(f.Brands) > 0 && !product.Brand.Contains(f.Brands) {
+			continue
+		}
+
+		if len(f.Conditions) > 0 && !product.Condition.Contains(f.Conditions) {
+			continue
+		}
+
 		filteredProducts = append(filteredProducts, product)
 	}
 
@@ -69,6 +85,18 @@ func NewProductFiltersFromRequest(r *http.Request) *ProductFilters {
 		maxPriceParsed, _ := strconv.ParseFloat(maxPrice, 64)
 		f.MinPrice = &minPriceParsed
 		f.MaxPrice = &maxPriceParsed
+	}
+
+	if v, ok := q["category"]; ok {
+		f.Categories = v
+	}
+
+	if v, ok := q["brand"]; ok {
+		f.Brands = v
+	}
+
+	if v, ok := q["condition"]; ok {
+		f.Conditions = v
 	}
 
 	return f

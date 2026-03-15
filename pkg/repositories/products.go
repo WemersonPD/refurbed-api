@@ -63,6 +63,9 @@ func (p *productsRepository) joinProductsMetadataAndDetails(metadata []*models.P
 				Colors:          detail.Colors,
 				ImageURL:        meta.ImageURL,
 				Stock:           detail.Stock,
+				Category:        detail.Category,
+				Brand:           detail.Brand,
+				Condition:       detail.Condition,
 
 				// Metadata fields
 				ID:        meta.ID,

@@ -46,6 +46,48 @@
     "name": "HomePod Mini",
     "base_price": 99.99,
     "image_url": "https://files.refurbed.com/ii/weiss-1564136596.jpg?t=fitdesign&h=600&w=800"
+  },
+  {
+    "id": "p9",
+    "name": "Samsung Galaxy S24",
+    "base_price": 549.99,
+    "image_url": "https://files.refurbed.com/ii/samsung-galaxy-s24-1705560148.jpg?t=fitdesign&h=600&w=800"
+  },
+  {
+    "id": "p10",
+    "name": "Samsung Galaxy Tab S9",
+    "base_price": 649.99,
+    "image_url": "https://files.refurbed.com/ii/samsung-galaxy-tab-s9-ultra-1693393938.jpg?t=fitdesign&h=600&w=800"
+  },
+  {
+    "id": "p11",
+    "name": "Samsung Galaxy Book3",
+    "base_price": 899.99,
+    "image_url": "https://files.refurbed.com/pi/samsung-galaxy-book3-pro-360-16-1689680667.jpg?t=fitdesign&h=600&w=800"
+  },
+  {
+    "id": "p12",
+    "name": "Google Pixel 8",
+    "base_price": 449.99,
+    "image_url": "https://files.refurbed.com/ii/google-pixel-8-1700125144.jpg?t=fitdesign&h=600&w=800"
+  },
+  {
+    "id": "p13",
+    "name": "Google Pixel Buds Pro",
+    "base_price": 139.99,
+    "image_url": "https://files.refurbed.com/ii/google-pixel-buds-pro-1736942009662153274.jpg?t=fitdesign&h=600&w=800"
+  },
+  {
+    "id": "p14",
+    "name": "Xiaomi 14",
+    "base_price": 499.99,
+    "image_url": "https://files.refurbed.com/ii/xiaomi-14-1713250553688402866.jpg?t=fitdesign&h=600&w=800"
+  },
+  {
+    "id": "p15",
+    "name": "Xiaomi Pad 6",
+    "base_price": 349.99,
+    "image_url": "https://files.refurbed.com/ii/xiaomi-pad-6-1704966620.jpg?t=fitdesign&h=600&w=800"
   }
 ]
 

@@ -4,56 +4,150 @@
     "discount_percent": 25,
     "bestseller": true,
     "colors": ["blue", "red", "green"],
-    "stock": 34
+    "stock": 34,
+    "category": "smartphones",
+    "brand": "apple",
+    "condition": "refurbished"
   },
   {
     "id": "p2",
     "discount_percent": 10,
     "bestseller": true,
     "colors": ["silver", "gray"],
-    "stock": 12
+    "stock": 12,
+    "category": "laptops",
+    "brand": "apple",
+    "condition": "refurbished"
   },
   {
     "id": "p3",
     "discount_percent": 15,
     "bestseller": false,
     "colors": ["silver", "blue", "pink"],
-    "stock": 23
+    "stock": 23,
+    "category": "tablets",
+    "brand": "apple",
+    "condition": "refurbished"
   },
   {
     "id": "p4",
     "discount_percent": 20,
     "bestseller": true,
     "colors": ["white"],
-    "stock": 45
+    "stock": 45,
+    "category": "accessories",
+    "brand": "apple",
+    "condition": "new"
   },
   {
     "id": "p5",
     "discount_percent": 0,
     "bestseller": false,
     "colors": ["black", "silver", "blue"],
-    "stock": 18
+    "stock": 18,
+    "category": "accessories",
+    "brand": "apple",
+    "condition": "refurbished"
   },
   {
     "id": "p6",
     "discount_percent": 5,
     "bestseller": false,
     "colors": ["silver", "blue", "green", "pink"],
-    "stock": 8
+    "stock": 8,
+    "category": "laptops",
+    "brand": "apple",
+    "condition": "used"
   },
   {
     "id": "p7",
     "discount_percent": 12,
     "bestseller": false,
     "colors": ["silver"],
-    "stock": 15
+    "stock": 15,
+    "category": "laptops",
+    "brand": "apple",
+    "condition": "refurbished"
   },
   {
     "id": "p8",
     "discount_percent": 0,
     "bestseller": false,
     "colors": ["white", "blue", "orange"],
-    "stock": 67
+    "stock": 67,
+    "category": "accessories",
+    "brand": "apple",
+    "condition": "new"
+  },
+  {
+    "id": "p9",
+    "discount_percent": 18,
+    "bestseller": true,
+    "colors": ["black", "violet", "yellow"],
+    "stock": 42,
+    "category": "smartphones",
+    "brand": "samsung",
+    "condition": "refurbished"
+  },
+  {
+    "id": "p10",
+    "discount_percent": 10,
+    "bestseller": false,
+    "colors": ["gray", "beige"],
+    "stock": 14,
+    "category": "tablets",
+    "brand": "samsung",
+    "condition": "used"
+  },
+  {
+    "id": "p11",
+    "discount_percent": 22,
+    "bestseller": false,
+    "colors": ["silver", "gray"],
+    "stock": 9,
+    "category": "laptops",
+    "brand": "samsung",
+    "condition": "refurbished"
+  },
+  {
+    "id": "p12",
+    "discount_percent": 20,
+    "bestseller": true,
+    "colors": ["black", "green", "blue"],
+    "stock": 30,
+    "category": "smartphones",
+    "brand": "google",
+    "condition": "refurbished"
+  },
+  {
+    "id": "p13",
+    "discount_percent": 0,
+    "bestseller": false,
+    "colors": ["white", "red", "green"],
+    "stock": 38,
+    "category": "accessories",
+    "brand": "google",
+    "condition": "new"
+  },
+  {
+    "id": "p14",
+    "discount_percent": 12,
+    "bestseller": true,
+    "colors": ["black", "green", "white"],
+    "stock": 27,
+    "category": "smartphones",
+    "brand": "xiaomi",
+    "condition": "new"
+  },
+  {
+    "id": "p15",
+    "discount_percent": 14,
+    "bestseller": false,
+    "colors": ["gray", "blue", "gold"],
+    "stock": 19,
+    "category": "tablets",
+    "brand": "xiaomi",
+    "condition": "refurbished"
   }
 ]
 
