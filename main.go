@@ -5,9 +5,13 @@ import (
 	utils_middlewares "assignment-backend/pkg/utils/middlewares"
 	"log"
 	"net/http"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	godotenv.Load()
+
 	productsController := controllers.NewProductsController()
 
 	mux := http.NewServeMux()
@@ -27,7 +31,7 @@ func main() {
 	mux.HandleFunc("/products", productsController.GetProducts)
 
 	log.Println("Server starting on http://localhost:8080")
-	if err := http.ListenAndServe(":8080", utils_middlewares.RecoverErrorMiddleware(mux)); err != nil {
+	if err := http.ListenAndServe(":8080", utils_middlewares.CorsMiddleware(utils_middlewares.RecoverErrorMiddleware(mux))); err != nil {
 		log.Fatal(err)
 	}
 }
