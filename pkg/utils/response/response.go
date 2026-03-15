@@ -10,6 +10,13 @@ type ApiResponse[T any] struct {
 	Data T    `json:"data"`
 }
 
+type Pagination[T any] struct {
+	Limit  int `json:"limit"`
+	Offset int `json:"offset"`
+	Total  int `json:"total"`
+	Data   T   `json:"data"`
+}
+
 func toJson[T any](w http.ResponseWriter, status int, data T) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
@@ -21,6 +28,10 @@ func toJson[T any](w http.ResponseWriter, status int, data T) {
 }
 
 func Success[T any](w http.ResponseWriter, data T) {
+	toJson(w, http.StatusOK, data)
+}
+
+func SuccessPaginated[T any](w http.ResponseWriter, data Pagination[T]) {
 	toJson(w, http.StatusOK, data)
 }
 

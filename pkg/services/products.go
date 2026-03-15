@@ -7,7 +7,7 @@ import (
 )
 
 type ProductService interface {
-	GetProducts(ctx context.Context, filters *models.ProductFilters, sort models.ProductSortBy, pagination *models.Pagination) ([]*models.Product, error)
+	CountProducts(ctx context.Context, filters *models.ProductFilters, sort models.ProductSortBy, pagination *models.Pagination) (products []*models.Product, count int, err error)
 }
 
 type productService struct {
@@ -20,11 +20,21 @@ func NewProductService() ProductService {
 	}
 }
 
-func (s *productService) GetProducts(ctx context.Context, filters *models.ProductFilters, sort models.ProductSortBy, pagination *models.Pagination) ([]*models.Product, error) {
-	// Get the data from cache.
+func (s *productService) CountProducts(ctx context.Context, filters *models.ProductFilters, sort models.ProductSortBy, pagination *models.Pagination) (products []*models.Product, count int, err error) {
+	// TODO: Get the data from cache.
 
 	// Get the data from database if not in cache.
-	products, err := s.productsRepository.GetProducts(ctx, filters, sort, pagination)
+	products, err = s.productsRepository.ListProducts(ctx, filters, sort, pagination)
+	if err != nil {
+		return nil, 0, err
+	}
 
-	return products, err
+	count, err = s.productsRepository.CountProducts(ctx, filters)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// TODO: Save the data to cache.
+
+	return products, count, err
 }

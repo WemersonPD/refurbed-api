@@ -13,8 +13,11 @@ const (
 )
 
 type ProductsRepository interface {
-	// GetProducts reads the metadata and details, merges them and returns the list of products.
-	GetProducts(ctx context.Context, filters *models.ProductFilters, sortBy models.ProductSortBy, pagination *models.Pagination) (products []*models.Product, err error)
+	// ListProducts reads the metadata and details, merges them and returns the list of products.
+	ListProducts(ctx context.Context, filters *models.ProductFilters, sortBy models.ProductSortBy, pagination *models.Pagination) (products []*models.Product, err error)
+
+	// CountProducts return the list of products based on a query.
+	CountProducts(_ context.Context, filters *models.ProductFilters) (count int, err error)
 }
 
 type productsRepository struct {
@@ -76,7 +79,7 @@ func (p *productsRepository) joinProductsMetadataAndDetails(metadata []*models.P
 	return products
 }
 
-func (p *productsRepository) GetProducts(_ context.Context, filters *models.ProductFilters, sortBy models.ProductSortBy, pagination *models.Pagination) (products []*models.Product, err error) {
+func (p *productsRepository) findProducts(_ context.Context, filters *models.ProductFilters) (products []*models.Product, err error) {
 	metadata, err := p.getProductsMetadata()
 	if err != nil {
 		return nil, err
@@ -93,6 +96,15 @@ func (p *productsRepository) GetProducts(_ context.Context, filters *models.Prod
 	// Apply filters / WHERE clause in database.
 	products = filters.ApplyProductFilters(products)
 
+	return products, err
+}
+
+func (p *productsRepository) ListProducts(_ context.Context, filters *models.ProductFilters, sortBy models.ProductSortBy, pagination *models.Pagination) (products []*models.Product, err error) {
+	products, err = p.findProducts(context.Background(), filters)
+	if err != nil {
+		return nil, err
+	}
+
 	// Apply sorting / ORDER BY clause in database.
 	products = sortBy.SortProducts(products)
 
@@ -100,4 +112,13 @@ func (p *productsRepository) GetProducts(_ context.Context, filters *models.Prod
 	products = pagination.ApplyProductsPagination(products)
 
 	return products, nil
+}
+
+func (p *productsRepository) CountProducts(_ context.Context, filters *models.ProductFilters) (count int, err error) {
+	products, err := p.findProducts(context.Background(), filters)
+	if err != nil {
+		return 0, err
+	}
+
+	return len(products), err
 }

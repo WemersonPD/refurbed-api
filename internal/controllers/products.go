@@ -32,11 +32,18 @@ func (c *productsController) GetProducts(w http.ResponseWriter, r *http.Request)
 	}
 
 	ctx := r.Context()
-	products, err := c.productService.GetProducts(ctx, filters, sort, pagination)
+	products, count, err := c.productService.CountProducts(ctx, filters, sort, pagination)
 	if err != nil {
 		utils_response.Error(w, http.StatusInternalServerError, "Failed to retrieve products")
 		return
 	}
 
-	utils_response.Success(w, products)
+	paginatedResponse := utils_response.Pagination[[]*models.Product]{
+		Limit:  pagination.Limit,
+		Offset: pagination.Offset,
+		Total:  count,
+		Data:   products,
+	}
+
+	utils_response.SuccessPaginated(w, paginatedResponse)
 }
