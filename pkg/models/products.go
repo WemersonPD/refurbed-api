@@ -137,3 +137,8 @@ type Product struct {
 	Brand           Brand     `json:"brand"`
 	Condition       Condition `json:"condition"`
 }
+
+type ProductsResponse struct {
+	Products []*Product `json:"products"`
+	Count    int        `json:"count"`
+}

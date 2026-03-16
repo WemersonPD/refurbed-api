@@ -3,38 +3,52 @@ package services
 import (
 	"assignment-backend/pkg/models"
 	"assignment-backend/pkg/repositories"
+	utils_cache "assignment-backend/pkg/utils/cache"
 	"context"
 )
 
 type ProductService interface {
-	CountProducts(ctx context.Context, filters *models.ProductFilters, sort models.ProductSortBy, pagination *models.Pagination) (products []*models.Product, count int, err error)
+	GetProducts(ctx context.Context, cacheKey string, filters *models.ProductFilters, sort models.ProductSortBy, pagination *models.Pagination) (response *models.ProductsResponse, err error)
 }
 
 type productService struct {
 	productsRepository repositories.ProductsRepository
+	productsCache      *utils_cache.Cache[*models.ProductsResponse]
 }
 
 func NewProductService() ProductService {
 	return &productService{
 		productsRepository: repositories.NewProductsRepository(),
+		productsCache:      utils_cache.NewCache[*models.ProductsResponse](),
 	}
 }
 
-func (s *productService) CountProducts(ctx context.Context, filters *models.ProductFilters, sort models.ProductSortBy, pagination *models.Pagination) (products []*models.Product, count int, err error) {
-	// TODO: Get the data from cache.
+func (s *productService) GetProducts(ctx context.Context, cacheKey string, filters *models.ProductFilters, sort models.ProductSortBy, pagination *models.Pagination) (response *models.ProductsResponse, err error) {
+	response, hasCache := s.productsCache.Get(cacheKey)
+	if hasCache {
+		return response, err
+	}
 
 	// Get the data from database if not in cache.
-	products, err = s.productsRepository.ListProducts(ctx, filters, sort, pagination)
+	products, err := s.productsRepository.ListProducts(ctx, filters, sort, pagination)
 	if err != nil {
-		return nil, 0, err
+		return nil, err
 	}
 
-	count, err = s.productsRepository.CountProducts(ctx, filters)
+	count, err := s.productsRepository.CountProducts(ctx, filters)
 	if err != nil {
-		return nil, 0, err
+		return nil, err
 	}
 
-	// TODO: Save the data to cache.
+	response = &models.ProductsResponse{
+		Products: products,
+		Count:    count,
+	}
 
-	return products, count, err
+	s.productsCache.Set(cacheKey, response)
+
+	return &models.ProductsResponse{
+		Products: products,
+		Count:    count,
+	}, nil
 }
