@@ -24,9 +24,13 @@ type productsRepository struct {
 	jsonLoader utils_jsongloader.JSONLoader
 }
 
-func NewProductsRepository() ProductsRepository {
+func NewProductsRepository(jsonLoader utils_jsongloader.JSONLoader) ProductsRepository {
+	if jsonLoader == nil {
+		jsonLoader = utils_jsongloader.NewJSONLoader()
+	}
+
 	return &productsRepository{
-		jsonLoader: utils_jsongloader.NewJSONLoader(),
+		jsonLoader: jsonLoader,
 	}
 }
 
@@ -97,6 +101,9 @@ func (p *productsRepository) findProducts(_ context.Context, filters *models.Pro
 	products = p.joinProductsMetadataAndDetails(metadata, details)
 
 	// Apply filters / WHERE clause in database.
+	if filters == nil {
+		filters = &models.ProductFilters{}
+	}
 	products = filters.ApplyProductFilters(products)
 
 	return products, err

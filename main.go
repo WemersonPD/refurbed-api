@@ -12,7 +12,7 @@ import (
 func main() {
 	godotenv.Load()
 
-	productsController := controllers.NewProductsController()
+	productsController := controllers.NewProductsController(nil)
 
 	mux := http.NewServeMux()
 

@@ -12,18 +12,25 @@ type cacheEntry[T any] struct {
 
 const TTL = 30 * time.Second
 
-func (e cacheEntry[T]) IsExpired() bool {
-	return time.Since(e.CreatedAt) > TTL
+func (e cacheEntry[T]) IsExpired(tll time.Duration) bool {
+	return time.Since(e.CreatedAt) > tll
 }
 
 type Cache[T any] struct {
 	mu    sync.RWMutex
 	store map[string]cacheEntry[T]
+	ttl   time.Duration
 }
 
-func NewCache[T any]() *Cache[T] {
+func NewCache[T any](ttl time.Duration) *Cache[T] {
+	if ttl == 0 {
+		ttl = TTL
+	}
+
 	return &Cache[T]{
+		mu:    sync.RWMutex{},
 		store: make(map[string]cacheEntry[T]),
+		ttl:   ttl,
 	}
 }
 
@@ -32,7 +39,7 @@ func (c *Cache[T]) Get(key string) (T, bool) {
 	defer c.mu.RUnlock()
 
 	entry, exists := c.store[key]
-	if !exists || entry.IsExpired() {
+	if !exists || entry.IsExpired(c.ttl) {
 		var zero T
 		return zero, false
 	}

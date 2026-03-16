@@ -16,10 +16,18 @@ type productService struct {
 	productsCache      *utils_cache.Cache[*models.ProductsResponse]
 }
 
-func NewProductService() ProductService {
+func NewProductService(repo repositories.ProductsRepository, cache *utils_cache.Cache[*models.ProductsResponse]) ProductService {
+	if repo == nil {
+		repo = repositories.NewProductsRepository(nil)
+	}
+
+	if cache == nil {
+		cache = utils_cache.NewCache[*models.ProductsResponse](0)
+	}
+
 	return &productService{
-		productsRepository: repositories.NewProductsRepository(),
-		productsCache:      utils_cache.NewCache[*models.ProductsResponse](),
+		productsRepository: repo,
+		productsCache:      cache,
 	}
 }
 

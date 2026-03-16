@@ -16,9 +16,13 @@ type productsController struct {
 	productService services.ProductService
 }
 
-func NewProductsController() ProductsController {
+func NewProductsController(productService services.ProductService) ProductsController {
+	if productService == nil {
+		productService = services.NewProductService(nil, nil)
+	}
+
 	return &productsController{
-		productService: services.NewProductService(),
+		productService: productService,
 	}
 }
 
